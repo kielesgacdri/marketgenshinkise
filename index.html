@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genshin Impact Premium Marketplace</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; }
+        .glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <header class="glass sticky top-0 z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <span class="text-2xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">GENSHIN MARKET</span>
+            <button onclick="openLoginModal()" class="bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-amber-500/20">Login Admin</button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="glass rounded-3xl p-8 sm:p-12 mb-10 relative overflow-hidden border border-amber-500/20">
+            <div class="relative z-10 max-w-2xl">
+                <span class="bg-amber-500/10 text-amber-400 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-amber-500/20">Trusted Store</span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold mt-4 mb-4 tracking-tight">Jual Beli Akun Genshin Impact Teraman & 24/7</h1>
+                <p class="text-gray-400 text-sm sm:text-base mb-6">Dapatkan akun impian dengan karakter bintang 5 lengkap dan harga terbaik.</p>
+            </div>
+        </div>
+
+        <div id="adminPanel" class="hidden glass rounded-2xl p-6 mb-10 border border-emerald-500/30">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-emerald-400">⚡ Panel Admin (Upload Akun)</h2>
+                <button onclick="logoutAdmin()" class="text-red-400 text-sm hover:underline">Logout</button>
+            </div>
+            <form id="productForm" onsubmit="uploadProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <input type="text" id="title" placeholder="Judul Akun (Contoh: AR 58 | Raiden)" required class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
+                <select id="server" class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm text-gray-300">
+                    <option value="Asia">Server: Asia</option>
+                    <option value="America">Server: America</option>
+                    <option value="Europe">Server: Europe</option>
+                </select>
+                <input type="number" id="price" placeholder="Harga (Rp)" required class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
+                <input type="text" id="image" placeholder="Link Gambar / Foto Akun" required class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
+                <textarea id="description" placeholder="Deskripsi Detail" rows="3" class="sm:col-span-2 glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm"></textarea>
+                <button type="submit" class="sm:col-span-2 bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-bold py-3 rounded-xl transition">Posting Akun</button>
+            </form>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-6">Daftar Akun Tersedia</h2>
+        <div id="productList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+
+    <div id="loginModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="glass max-w-md w-full p-6 rounded-3xl border border-gray-700 relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">&times;</button>
+            <h3 class="text-xl font-bold mb-2">Login Owner via WhatsApp OTP</h3>
+            <div id="step1Form" class="space-y-4">
+                <input type="text" id="loginUser" placeholder="Username Admin (kiseadmin)" class="w-full glass px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
+                <input type="password" id="loginPass" placeholder="Password Admin" class="w-full glass px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
+                <input type="text" id="loginPhone" placeholder="Nomor WhatsApp (628...)" class="w-full glass px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-amber-500">
+                <button onclick="sendOTP()" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold py-3 rounded-xl transition">Kirim Kode OTP</button>
+            </div>
+            <div id="step2Form" class="space-y-4 hidden">
+                <p class="text-xs text-emerald-400">Masukkan 6 digit OTP (Atau kode darurat: <b class="text-white">123456</b>):</p>
+                <input type="text" id="otpCode" placeholder="6 Digit OTP" class="w-full glass px-4 py-3 rounded-xl text-sm tracking-widest text-center font-bold text-lg focus:outline-none focus:border-amber-500">
+                <button onclick="verifyOTP()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-bold py-3 rounded-xl transition">Verifikasi & Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '';
+
+        function openLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
+
+        async function sendOTP() {
+            const username = document.getElementById('loginUser').value;
+            const password = document.getElementById('loginPass').value;
+            const phone = document.getElementById('loginPhone').value;
+            if(!username || !password || !phone) { alert('Isi semua data!'); return; }
+            const res = await fetch(`${API_URL}/api/send-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, phone })
+            });
+            const data = await res.json();
+            alert(data.message);
+            if(data.success) {
+                document.getElementById('step1Form').classList.add('hidden');
+                document.getElementById('step2Form').classList.remove('hidden');
+            }
+        }
+
+        async function verifyOTP() {
+            const username = document.getElementById('loginUser').value;
+            const otp = document.getElementById('otpCode').value;
+            const res = await fetch(`${API_URL}/api/verify-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, otp })
+            });
+            const data = await res.json();
+            alert(data.message);
+            if(data.success) {
+                closeLoginModal();
+                document.getElementById('adminPanel').classList.remove('hidden');
+                localStorage.setItem('isAdminLoggedIn', 'true');
+            }
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('isAdminLoggedIn');
+            document.getElementById('adminPanel').classList.add('hidden');
+            alert('Logout!');
+        }
+
+        window.onload = () => {
+            if(localStorage.getItem('isAdminLoggedIn') === 'true') {
+                document.getElementById('adminPanel').classList.remove('hidden');
+            }
+            fetchProducts();
+        }
+
+        async function uploadProduct(e) {
+            e.preventDefault();
+            const productData = {
+                title: document.getElementById('title').value,
+                server: document.getElementById('server').value,
+                price: document.getElementById('price').value,
+                image: document.getElementById('image').value,
+                description: document.getElementById('description').value,
+                seller: 'Kise Admin'
+            };
+            const res = await fetch(`${API_URL}/api/products`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productData)
+            });
+            const data = await res.json();
+            alert(data.message);
+            document.getElementById('productForm').reset();
+            fetchProducts();
+        }
+
+        async function fetchProducts() {
+            try {
+                const res = await fetch(`${API_URL}/api/products`);
+                const products = await res.json();
+                const container = document.getElementById('productList');
+                container.innerHTML = '';
+                if(products.length === 0) {
+                    container.innerHTML = `<p class="text-gray-500 col-span-full text-center py-10">Belum ada akun.</p>`;
+                    return;
+                }
+                products.forEach(p => {
+                    container.innerHTML += `
+                        <div class="glass rounded-2xl overflow-hidden border border-gray-800 flex flex-col justify-between">
+                            <div>
+                                <img src="${p.image}" alt="Akun" class="w-full h-48 object-cover">
+                                <div class="p-5">
+                                    <span class="text-xs bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-md font-semibold border border-amber-500/20">${p.server}</span>
+                                    <h3 class="font-bold text-lg mt-2 mb-1">${p.title}</h3>
+                                    <p class="text-gray-400 text-xs line-clamp-2 mb-4">${p.description}</p>
+                                </div>
+                            </div>
+                            <div class="p-5 pt-0 flex items-center justify-between">
+                                <span class="text-amber-400 font-extrabold text-lg">Rp ${Number(p.price).toLocaleString()}</span>
+                                <a href="https://wa.me/?text=Halo%20Admin,%20saya%20tertarik%20dengan%20akun%20${encodeURIComponent(p.title)}" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition">Beli via WA</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                console.log("Gagal memuat produk");
+            }
+        }
+    </script>
+</body>
+</html>
