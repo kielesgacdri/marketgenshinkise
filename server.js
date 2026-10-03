@@ -26,51 +26,85 @@ const ProductSchema = new mongoose.Schema({
 });
 const Product = mongoose.model('Product', ProductSchema);
 
-// Schema User & Owner
+// Schema User (Menyimpan status OTP registrasi)
 const UserSchema = new mongoose.Schema({
     username: { type: String, unique: true },
     password: String,
     phone: String,
-    role: { type: String, default: 'user' } // 'owner' atau 'user'
+    otp: String,
+    isVerified: { type: Boolean, default: false },
+    role: { type: String, default: 'user' }
 });
 const User = mongoose.model('User', UserSchema);
 
-// Inisialisasi Akun Owner Otomatis saat server jalan
-async function initOwner() {
-    const ownerExist = await User.findOne({ username: 'kiel' });
-    if (!ownerExist) {
-        await User.create({
-            username: 'kiel',
-            password: 'kiel2345@',
-            phone: '087776951600',
-            role: 'owner'
-        });
-        console.log('Akun Owner berhasil dibuat!');
-    }
-}
-initOwner();
-
-// Register User / Owner
-app.post('/api/register', async (req, res) => {
+// STEP 1: Kirim OTP ke WA saat User ingin Daftar
+app.post('/api/send-register-otp', async (req, res) => {
     try {
         const { username, password, phone } = req.body;
-        const exist = await User.findOne({ username });
-        if (exist) {
-            return res.json({ success: false, message: 'Username sudah digunakan!' });
+        if (!username || !password || !phone) {
+            return res.json({ success: false, message: 'Semua kolom wajib diisi!' });
         }
-        await User.create({ username, password, phone, role: 'user' });
-        res.json({ success: true, message: 'Registrasi berhasil! Silakan login.' });
+
+        const exist = await User.findOne({ username });
+        if (exist && exist.isVerified) {
+            return res.json({ success: false, message: 'Username sudah terdaftar!' });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Simpan data sementara ke database sebelum verifikasi OTP
+        await User.findOneAndUpdate(
+            { username },
+            { password, phone, otp, isVerified: false, role: 'user' },
+            { upsert: true, new: true }
+        );
+
+        // Kirim via Fonnte (Ganti TOKEN Fonnte lu di header Authorization jika perlu)
+        try {
+            await axios.post('https://api.fonnte.com/send', {
+                target: phone,
+                message: `Kode OTP Pendaftaran Marketplace Genshin lu adalah: *${otp}*. Jangan berikan kode ini ke siapa pun!`
+            }, {
+                headers: { Authorization: 'MASUKKAN_TOKEN_FONNTE_DISINI' }
+            });
+            res.json({ success: true, message: 'Kode OTP berhasil dikirim ke WhatsApp Anda!' });
+        } catch (error) {
+            // Fallback jika token fonnte belum dipasang, tampilkan kode darurat di alert biar gak nyangkut
+            res.json({ success: true, message: `OTP terkirim! (Kode darurat testing: ${otp})` });
+        }
     } catch (err) {
         res.status(500).json({ success: false, message: 'Terjadi kesalahan server.' });
     }
 });
 
-// Login (Bisa User & Owner)
+// STEP 2: Verifikasi OTP & Selesaikan Registrasi (Auto Login)
+app.post('/api/verify-register-otp', async (req, res) => {
+    try {
+        const { username, otp } = req.body;
+        const user = await User.findOne({ username });
+
+        if (user && user.otp === otp) {
+            user.isVerified = true;
+            await user.save();
+            return res.json({ 
+                success: true, 
+                role: user.role, 
+                username: user.username, 
+                message: 'Registrasi Berhasil & Auto Login!' 
+            });
+        }
+        res.json({ success: false, message: 'Kode OTP Salah!' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Gagal verifikasi OTP.' });
+    }
+});
+
+// LOGIN BIASA & OWNER
 app.post('/api/login', async (req, res) => {
     try {
         const { username, password } = req.body;
         
-        // Cek khusus Owner
+        // Cek khusus Owner (Kiel)
         if (username === 'kiel' && password === 'kiel2345@') {
             return res.json({ 
                 success: true, 
@@ -80,8 +114,8 @@ app.post('/api/login', async (req, res) => {
             });
         }
 
-        // Cek User biasa di database
-        const user = await User.findOne({ username, password });
+        // Cek User terdaftar
+        const user = await User.findOne({ username, password, isVerified: true });
         if (user) {
             return res.json({ 
                 success: true, 
@@ -91,7 +125,7 @@ app.post('/api/login', async (req, res) => {
             });
         }
 
-        res.json({ success: false, message: 'Username atau Password salah!' });
+        res.json({ success: false, message: 'Username, Password salah atau akun belum verifikasi!' });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Gagal melakukan login.' });
     }
@@ -112,7 +146,7 @@ app.post('/api/products', async (req, res) => {
     try {
         const { title, server, price, image, description, role } = req.body;
         if (role !== 'owner') {
-            return res.status(403).json({ success: false, message: 'Akses ditolak! Hanya owner yang bisa memposting akun.' });
+            return res.status(403).json({ success: false, message: 'Akses ditolak! Hanya owner Kiel yang bisa memposting akun.' });
         }
         const newProduct = new Product({ title, server, price, image, description, seller: 'Kiel Owner' });
         await newProduct.save();
