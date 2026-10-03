@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f3f4f6; }
-        .glass { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
@@ -21,8 +21,8 @@
             <div class="flex items-center gap-4">
                 <div id="userGreeting" class="hidden text-xs sm:text-sm font-semibold text-amber-400"></div>
                 <!-- Tombol Sidebar (Titik Tiga) -->
-                <button onclick="toggleSidebar()" class="glass p-2.5 rounded-xl hover:bg-gray-800 transition flex items-center justify-center text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button type="button" onclick="toggleSidebar()" class="glass p-3 rounded-xl hover:bg-gray-800 transition flex items-center justify-center text-white cursor-pointer z-50">
+                    <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
                     </svg>
                 </button>
@@ -32,29 +32,30 @@
 
     <!-- SIDEBAR SLIDE DARI KANAN -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden transition-opacity" onclick="toggleSidebar()"></div>
-    <aside id="sidebar" class="fixed top-0 right-0 h-full w-80 glass z-50 transform translate-x-full transition-transform duration-300 p-6 flex flex-col justify-between border-l border-gray-800 shadow-2xl">
+    <aside id="sidebar" class="fixed top-0 right-0 h-full w-80 glass z-50 transform translate-x-full transition-transform duration-300 p-6 flex flex-col justify-between border-l border-gray-800 shadow-2xl overflow-y-auto">
         <div>
-            <div class="flex justify-between items-center mb-8">
+            <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-bold text-amber-400">Menu Navigasi</h3>
-                <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white text-xl font-bold">&times;</button>
+                <button type="button" onclick="toggleSidebar()" class="text-gray-400 hover:text-white text-2xl font-bold cursor-pointer p-2">&times;</button>
             </div>
 
             <div id="sidebarContent" class="space-y-6">
                 <!-- Status Belum Login -->
                 <div id="authSection" class="space-y-4">
-                    <div class="p-4 rounded-2xl bg-gray-900/50 border border-gray-800">
-                        <p class="text-xs text-gray-400 mb-2" id="authTitle">Belum punya akun? Daftar sekarang atau Login.</p>
+                    <div class="p-4 rounded-2xl bg-gray-900/60 border border-gray-800">
+                        <p class="text-xs text-gray-300 mb-3 font-medium" id="authTitle">Belum punya akun? Daftar sekarang atau Login.</p>
                         
                         <!-- Form Login/Register -->
-                        <div id="formBox" class="space-y-3 mt-3">
-                            <input type="text" id="inpUser" placeholder="Username" class="w-full glass px-3 py-2.5 rounded-xl text-xs focus:outline-none focus:border-amber-500">
-                            <input type="password" id="inpPass" placeholder="Password" class="w-full glass px-3 py-2.5 rounded-xl text-xs focus:outline-none focus:border-amber-500">
-                            <input type="text" id="inpPhone" placeholder="No WhatsApp (untuk Daftar)" class="w-full glass px-3 py-2.5 rounded-xl text-xs focus:outline-none focus:border-amber-500 hidden">
-                            
-                            <div class="flex gap-2 pt-1">
-                                <button onclick="handleAuthAction()" id="mainAuthBtn" class="flex-1 bg-amber-500 hover:bg-amber-600 text-gray-950 font-bold py-2.5 rounded-xl text-xs transition">Login</button>
+                        <div id="formBox" class="space-y-3">
+                            <input type="text" id="inpUser" placeholder="Username" class="w-full glass px-3.5 py-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+                            <input type="password" id="inpPass" placeholder="Password" class="w-full glass px-3.5 py-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500">
+                            <input type="text" id="inpPhone" placeholder="No WhatsApp (Contoh: 628...)" class="w-full glass px-3.5 py-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 hidden">
+                            <input type="text" id="inpOtp" placeholder="Masukkan 6 Digit Kode OTP WA" class="w-full glass px-3.5 py-3 rounded-xl text-xs tracking-widest text-center font-bold text-amber-400 focus:outline-none focus:border-amber-500 hidden">
+
+                            <div class="pt-2">
+                                <button type="button" onclick="handleAuthAction()" id="mainAuthBtn" class="w-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-gray-950 font-bold py-3 rounded-xl text-xs transition cursor-pointer shadow-lg">Login</button>
                             </div>
-                            <button onclick="switchAuthMode()" id="switchAuthBtn" class="w-full text-center text-xs text-amber-400 hover:underline pt-2">Belum punya akun? Daftar</button>
+                            <button type="button" onclick="switchAuthMode()" id="switchAuthBtn" class="w-full text-center text-xs text-amber-400 hover:underline pt-2 cursor-pointer">Belum punya akun? Daftar</button>
                         </div>
                     </div>
                 </div>
@@ -64,12 +65,12 @@
                     <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center">
                         <p class="text-xs text-emerald-400 font-semibold" id="loggedAsText">Login sebagai User</p>
                     </div>
-                    <button onclick="logout()" class="w-full bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 font-bold py-2.5 rounded-xl text-xs transition">Logout</button>
+                    <button type="button" onclick="logout()" class="w-full bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 font-bold py-3 rounded-xl text-xs transition cursor-pointer">Logout</button>
                 </div>
             </div>
         </div>
 
-        <div class="text-center text-xs text-gray-500">
+        <div class="text-center text-xs text-gray-500 pt-6">
             Genshin Market 24/7 &copy; 2026
         </div>
     </aside>
@@ -84,22 +85,22 @@
             </div>
         </div>
 
-        <!-- PANEL ADMIN / OWNER (Hanya muncul jika role == owner) -->
+        <!-- PANEL OWNER -->
         <div id="adminPanel" class="hidden glass rounded-2xl p-6 mb-10 border border-emerald-500/30">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-emerald-400">⚡ Panel Khusus Owner (Posting Akun)</h2>
+                <h2 class="text-xl font-bold text-emerald-400">⚡ Panel Khusus Owner Kiel (Posting Akun)</h2>
             </div>
             <form id="productForm" onsubmit="uploadProduct(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input type="text" id="title" placeholder="Judul Akun (Contoh: AR 58 | Raiden)" required class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
-                <select id="server" class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm text-gray-300">
+                <input type="text" id="title" placeholder="Judul Akun (Contoh: AR 58 | Raiden)" required class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm text-white">
+                <select id="server" class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm text-gray-300 bg-gray-900">
                     <option value="Asia">Server: Asia</option>
                     <option value="America">Server: America</option>
                     <option value="Europe">Server: Europe</option>
                 </select>
-                <input type="number" id="price" placeholder="Harga (Rp)" required class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
-                <input type="text" id="image" placeholder="Link Gambar / Foto Akun" required class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm">
-                <textarea id="description" placeholder="Deskripsi Detail" rows="3" class="sm:col-span-2 glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm"></textarea>
-                <button type="submit" class="sm:col-span-2 bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-bold py-3 rounded-xl transition">Posting Akun</button>
+                <input type="number" id="price" placeholder="Harga (Rp)" required class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm text-white">
+                <input type="text" id="image" placeholder="Link Gambar / Foto Akun" required class="glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm text-white">
+                <textarea id="description" placeholder="Deskripsi Detail" rows="3" class="sm:col-span-2 glass px-4 py-3 rounded-xl focus:outline-none focus:border-amber-500 text-sm text-white"></textarea>
+                <button type="submit" class="sm:col-span-2 bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-bold py-3 rounded-xl transition cursor-pointer">Posting Akun</button>
             </form>
         </div>
 
@@ -109,7 +110,7 @@
 
     <script>
         const API_URL = '';
-        let isRegisterMode = false;
+        let authMode = 'login'; // 'login', 'register_input', 'register_otp'
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -119,19 +120,23 @@
         }
 
         function switchAuthMode() {
-            isRegisterMode = !isRegisterMode;
             const phoneInput = document.getElementById('inpPhone');
+            const otpInput = document.getElementById('inpOtp');
             const mainBtn = document.getElementById('mainAuthBtn');
             const switchBtn = document.getElementById('switchAuthBtn');
             const title = document.getElementById('authTitle');
 
-            if (isRegisterMode) {
+            if (authMode === 'login') {
+                authMode = 'register_input';
                 phoneInput.classList.remove('hidden');
-                mainBtn.innerText = 'Daftar Sekarang';
+                otpInput.classList.add('hidden');
+                mainBtn.innerText = 'Kirim Kode OTP WA';
                 switchBtn.innerText = 'Sudah punya akun? Login';
-                title.innerText = 'Daftar akun baru di sini:';
+                title.innerText = 'Daftar Akun Baru (Masukkan No WA):';
             } else {
+                authMode = 'login';
                 phoneInput.classList.add('hidden');
+                otpInput.classList.add('hidden');
                 mainBtn.innerText = 'Login';
                 switchBtn.innerText = 'Belum punya akun? Daftar';
                 title.innerText = 'Belum punya akun? Daftar sekarang atau Login.';
@@ -139,39 +144,70 @@
         }
 
         async function handleAuthAction() {
-            const username = document.getElementById('inpUser').value;
-            const password = document.getElementById('inpPass').value;
-            const phone = document.getElementById('inpPhone').value;
+            const username = document.getElementById('inpUser').value.trim();
+            const password = document.getElementById('inpPass').value.trim();
+            const phone = document.getElementById('inpPhone').value.trim();
+            const otp = document.getElementById('inpOtp').value.trim();
 
             if(!username || !password) {
                 alert('Username dan Password wajib diisi!');
                 return;
             }
 
-            if (isRegisterMode) {
-                if(!phone) { alert('Nomor WhatsApp wajib diisi untuk pendaftaran!'); return; }
-                const res = await fetch(`${API_URL}/api/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, phone })
-                });
-                const data = await res.json();
-                alert(data.message);
-                if(data.success) { switchAuthMode(); }
-            } else {
-                const res = await fetch(`${API_URL}/api/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await res.json();
-                alert(data.message);
-                if(data.success) {
-                    localStorage.setItem('username', data.username);
-                    localStorage.setItem('role', data.role);
-                    updateAuthUI();
-                    toggleSidebar();
+            try {
+                if (authMode === 'register_input') {
+                    if(!phone) { alert('Nomor WhatsApp wajib diisi!'); return; }
+                    
+                    const res = await fetch(`${API_URL}/api/send-register-otp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password, phone })
+                    });
+                    const data = await res.json();
+                    alert(data.message);
+                    
+                    if(data.success) {
+                        authMode = 'register_otp';
+                        document.getElementById('inpPhone').classList.add('hidden');
+                        document.getElementById('inpOtp').classList.remove('hidden');
+                        document.getElementById('mainAuthBtn').innerText = 'Verifikasi & Daftar';
+                    }
+                } else if (authMode === 'register_otp') {
+                    if(!otp) { alert('Masukkan kode OTP yang masuk ke WA!'); return; }
+                    
+                    const res = await fetch(`${API_URL}/api/verify-register-otp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, otp })
+                    });
+                    const data = await res.json();
+                    alert(data.message);
+                    
+                    if(data.success) {
+                        localStorage.setItem('username', data.username);
+                        localStorage.setItem('role', data.role);
+                        updateAuthUI();
+                        toggleSidebar();
+                    }
+                } else {
+                    // Mode Login Biasa / Owner
+                    const res = await fetch(`${API_URL}/api/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const data = await res.json();
+                    alert(data.message);
+                    
+                    if(data.success) {
+                        localStorage.setItem('username', data.username);
+                        localStorage.setItem('role', data.role);
+                        updateAuthUI();
+                        toggleSidebar();
+                    }
                 }
+            } catch (err) {
+                alert('Gagal terhubung ke server. Coba beberapa saat lagi.');
             }
         }
 
